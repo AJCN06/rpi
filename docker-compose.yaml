@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  samba:
+    image: dperson/samba:rpi
+    container_name: samba
+    command: '-u "${PI_USER};${PASSWORD}" -s "server;/server;yes;no"'
+    stdin_open: true
+    tty: true
+    environment:
+      - TZ=${TZ}
+    ports:
+      - 139:130
+      - 445:445
+    volumes: 
+      - ${DEFAULT_PATH}:/server/
+    restart: always
+
+  rpi-monitor:
+    image: michaelmiklis/rpi-monitor:latest
+    container_name: rpi-monitor
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - /opt/vc:/opt/vc
+      - /boot:/boot
+      - /sys:/dockerhost/sys:ro
+      - /etc:/dockerhost/etc:ro
+      - /proc:/dockerhost/proc:ro
+      - /usr/lib:/dockerhost/usr/lib:ro
+    ports:
+      - 8888:8888
+    devices:
+      - /dev/vchiq
+      - /dev/vcsm
+    restart: always
